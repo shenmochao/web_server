@@ -610,10 +610,6 @@ bool http_conn::add_content_length(int content_len)
 {
     return add_response("Content-Length:%d\r\n", content_len);
 }
-bool http_conn::add_content_type()
-{
-    return add_response("Content-Type:%s\r\n", "text/html");
-}
 bool http_conn::add_linger()
 {
     return add_response("Connection:%s\r\n", (m_linger == true) ? "keep-alive" : "close");
@@ -625,6 +621,10 @@ bool http_conn::add_blank_line()
 bool http_conn::add_content(const char *content)
 {
     return add_response("%s", content);
+}
+bool http_conn::add_content_type()
+{
+    return add_response("Content-Type:%s\r\n", "text/html");
 }
 bool http_conn::process_write(HTTP_CODE ret)
 {
