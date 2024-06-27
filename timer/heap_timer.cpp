@@ -1,10 +1,13 @@
 #include "heap_timer.h"
 #include "../http/http_conn.h"
+#include "../log/log.h"
 
+// 构造函数
 sort_timer_lst::sort_timer_lst() {
-    timer_heap.reserve(64);
+    timer_heap.reserve(64); // 预留空间，避免频繁分配内存
 }
 
+// 析构函数
 sort_timer_lst::~sort_timer_lst() {
     for (util_timer* timer : timer_heap) {
         delete timer;
@@ -12,8 +15,9 @@ sort_timer_lst::~sort_timer_lst() {
     timer_heap.clear();
 }
 
+// 查找定时器在堆中的位置
 int sort_timer_lst::find_timer(util_timer *timer) {
-    auto it = lower_bound(timer_heap.begin(), timer_heap.end(), timer,
+    auto it = std::lower_bound(timer_heap.begin(), timer_heap.end(), timer,
         [](const util_timer* lhs, const util_timer* rhs) {
             return lhs->expire < rhs->expire;
         });
@@ -22,82 +26,82 @@ int sort_timer_lst::find_timer(util_timer *timer) {
         ++it;
     }
 
-    if (it != timer_heap.end() && *it == timer)
-    {
+    if (it != timer_heap.end() && *it == timer) {
         return it - timer_heap.begin();
     }
     return -1;
 }
 
+// 向上调整堆
 void sort_timer_lst::heapify_up(int index) {
     while (index > 0) {
-        int parent = (index-1)/2;
-        if (timer_heap[index]->expire >= timer_heap[parent]-> expire) {
+        int parent = (index - 1) / 2;
+        if (timer_heap[index]->expire >= timer_heap[parent]->expire) {
             break;
         }
-        swap(timer_heap[index], timer_heap[parent]);
+        std::swap(timer_heap[index], timer_heap[parent]);
         index = parent;
     }
 }
 
+// 向下调整堆
 void sort_timer_lst::heapify_down(int index) {
     int n = timer_heap.size();
-    while(index > 0) {
+    while (index < n) {
         int smallest = index;
         int left = 2 * index + 1;
         int right = 2 * index + 2;
-        if (timer_heap[smallest]->expire > timer_heap[right]-> expire) {
-            smallest = right;
-        }
-        if (timer_heap[smallest]->expire > timer_heap[left]-> expire) {
+        if (left < n && timer_heap[smallest]->expire > timer_heap[left]->expire) {
             smallest = left;
         }
-        if (smallest == index)
-        {
+        if (right < n && timer_heap[smallest]->expire > timer_heap[right]->expire) {
+            smallest = right;
+        }
+        if (smallest == index) {
             break;
         }
-        swap(timer_heap[index], timer_heap[smallest]);
+        std::swap(timer_heap[index], timer_heap[smallest]);
         index = smallest;
     }
 }
 
+// 添加定时器
 void sort_timer_lst::add_timer(util_timer *timer) {
     timer_heap.push_back(timer);
     heapify_up(timer_heap.size() - 1);
 }
 
+// 调整定时器
 void sort_timer_lst::adjust_timer(util_timer *timer) {
     int index = find_timer(timer);
-    if (index != -1)
-    {
+    if (index != -1) {
         heapify_up(index);
         heapify_down(index);
     }
 }
 
+// 删除定时器
 void sort_timer_lst::del_timer(util_timer *timer) {
     int index = find_timer(timer);
-    if (index != -1)
-    {
+    if (index != -1) {
         std::swap(timer_heap[index], timer_heap.back());
         timer_heap.pop_back();
-        if (index < timer_heap.size())
-        {
+        if (index < timer_heap.size()) {
             heapify_up(index);
             heapify_down(index);
         }
     }
 }
 
+// 定时器触发处理
 void sort_timer_lst::tick() {
     time_t cur = time(NULL);
-    while(!timer_heap.empty()) {
+    while (!timer_heap.empty()) {
         util_timer *timer = timer_heap.front();
-        if(timer->expire > cur) {
+        if (timer->expire > cur) {
             break;
         }
-        if (timer->cb_func)
-        {
+        if (timer->cb_func) {
             timer->cb_func(timer->user_data);
         }
         del_timer(timer);
