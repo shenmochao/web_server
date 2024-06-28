@@ -4,17 +4,17 @@ Config::Config(){
     //端口号,默认9006
     PORT = 9006;
 
-    //日志写入方式，默认同步
-    LOGWrite = 0;
+    //日志写入方式，默认异步(1)
+    LOGWrite = 1;
 
-    //触发组合模式,默认listenfd LT + connfd LT
-    TRIGMode = 0;
+    //触发组合模式(1),默认listenfd LT + connfd ET
+    TRIGMode = 1;
 
-    //listenfd触发模式，默认LT
+    //listenfd触发模式，默认LT(0)
     LISTENTrigmode = 0;
 
-    //connfd触发模式，默认LT
-    CONNTrigmode = 0;
+    //connfd触发模式，默认ET(1)
+    CONNTrigmode = 1;
 
     //优雅关闭链接，默认不使用
     OPT_LINGER = 0;
@@ -23,10 +23,10 @@ Config::Config(){
     sql_num = 8;
 
     //线程池内的线程数量,默认8
-    thread_num = 8;
+    thread_num = 16;
 
-    //关闭日志,默认不关闭
-    close_log = 0;
+    //关闭日志,默认关闭(1) 打开(0)
+    close_log = 1;
 
     //并发模型,默认是proactor
     actor_model = 0;

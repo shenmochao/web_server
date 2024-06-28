@@ -6,7 +6,7 @@ Linux下C++轻量级Web服务器，参考自热门项目TinyWebServer
 * 使用**状态机**解析HTTP请求报文，支持解析**GET和POST**请求
 * 访问服务器数据库实现web端用户**注册、登录**功能，可以请求服务器**图片和视频文件**
 * 实现**同步/异步日志系统**，记录服务器运行状态
-* 实现**时间堆/时间轮**定时器
+* 实现**时间堆/时间轮**定时器,默认使用时间堆
 * 经Webbench压力测试可以实现**上万的并发连接**数据交换
 
 理论参考
@@ -15,58 +15,47 @@ Linux下C++轻量级Web服务器，参考自热门项目TinyWebServer
 
 压力测试
 -------------
-测试结果：
-![alt text](image.png)
+```cpp
+cd /test_pressure/webbench-1.5
+
+make clean
+
+make & make install
+
+webbench -c 10000 -t 5 http:127.0.0.1:9006/
+```
+报错可参考处理：https://blog.csdn.net/qq_44857215/article/details/128788582
 
 
-压力测试
+测试结果
 -------------
-在关闭日志后，使用Webbench对服务器进行压力测试，对listenfd和connfd分别采用ET和LT模式，均可实现上万的并发连接，下面列出的是两者组合后的测试结果. 
+在关闭日志后，使用Webbench对服务器进行压力测试，对listenfd和connfd分别采用ET和LT模式
 
-> * Proactor，LT + LT，93251 QPS
+> * Proactor，LT + LT，29997 QPS
+![alt text](root/result-1.png)
 
-<div align=center><img src="http://ww1.sinaimg.cn/large/005TJ2c7ly1gfjqu2hptkj30gz07474n.jpg" height="201"/> </div>
+> * Proactor，LT + ET，31206 QPS
+![alt text](root/result-2.png)
 
-> * Proactor，LT + ET，97459 QPS
+> * Proactor，ET + LT，26315 QPS
+![alt text](root/result-3.png)
 
-<div align=center><img src="http://ww1.sinaimg.cn/large/005TJ2c7ly1gfjr1xppdgj30h206zdg6.jpg" height="201"/> </div>
+> * Proactor，ET + ET，29758 QPS
+![alt text](root/result-4.png)
 
-> * Proactor，ET + LT，80498 QPS
-
-<div align=center><img src="http://ww1.sinaimg.cn/large/005TJ2c7ly1gfjr24vmjtj30gz0720t3.jpg" height="201"/> </div>
-
-> * Proactor，ET + ET，92167 QPS
-
-<div align=center><img src="http://ww1.sinaimg.cn/large/005TJ2c7ly1gfjrflrebdj30gz06z0t3.jpg" height="201"/> </div>
-
-> * Reactor，LT + ET，69175 QPS
-
-<div align=center><img src="http://ww1.sinaimg.cn/large/005TJ2c7ly1gfjr1humcbj30h207474n.jpg" height="201"/> </div>
-
-> * 并发连接总数：10500
+> * 并发连接总数：10000
 > * 访问服务器时间：5s
 > * 所有访问均成功
-
-**注意：** 使用本项目的webbench进行压测时，若报错显示webbench命令找不到，将可执行文件webbench删除后，重新编译即可。
-
-测试环境
-------------
-WSL2子系统中的Ubuntu 22.04
-
-CPU：11th Gen Intel(R) Core(TM) i7-11800 @ 2.30GHz
-
-8核 内存15.6GB
 
 快速运行
 ------------
 * 服务器测试环境
-	* Ubuntu版本16.04
-	* MySQL版本5.7.29
+	* WSL2子系统中的Ubuntu版本22.04
+	* MySQL版本8.0.37
+    * CPU：11th Gen Intel(R) Core(TM) i7-11800 @ 2.30GHz
 * 浏览器测试环境
 	* Windows、Linux均可
-	* Chrome
-	* FireFox
-	* 其他浏览器暂无测试
+	* Chrome/edge
 
 * 测试前确认已安装MySQL数据库
 
@@ -90,7 +79,7 @@ CPU：11th Gen Intel(R) Core(TM) i7-11800 @ 2.30GHz
     ```C++
     //数据库登录名,密码,库名
     string user = "root";
-    string passwd = "root";
+    string passwd = "111111";
     string databasename = "yourdb";
     ```
 
