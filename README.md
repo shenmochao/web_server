@@ -29,19 +29,32 @@ webbench -c 10000 -t 5 http:127.0.0.1:9006/
 
 测试结果
 -------------
-在关闭日志后，使用Webbench对服务器进行压力测试，对listenfd和connfd分别采用ET和LT模式
+在关闭日志后，使用Webbench对服务器进行压力测试，对listenfd和connfd分别采用ET和LT模式，默认使用时间堆
 
-> * Proactor，LT + LT，29997 QPS
+> * 时间堆，Proactor，LT + LT，29997 QPS
 ![alt text](root/result-1.png)
 
-> * Proactor，LT + ET，31206 QPS
+> * 时间堆，Proactor，LT + ET，31206 QPS
 ![alt text](root/result-2.png)
 
-> * Proactor，ET + LT，26315 QPS
+> * 时间堆，Proactor，ET + LT，26315 QPS
 ![alt text](root/result-3.png)
 
-> * Proactor，ET + ET，29758 QPS
+> * 时间堆，Proactor，ET + ET，29758 QPS
 ![alt text](root/result-4.png)
+
+> * 时间轮，Proactor，LT + LT，28318 QPS
+![alt text](root/result-5.png)
+
+> * 时间轮，Proactor，LT + ET，29289 QPS
+![alt text](root/result-6.png)
+
+> * 时间轮，Proactor，ET + LT，27116 QPS
+![alt text](root/result-7.png)
+
+> * 时间轮，Proactor，ET + ET，29792 QPS
+![alt text](root/result-8.png)
+
 
 > * 并发连接总数：10000
 > * 访问服务器时间：5s
